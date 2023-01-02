@@ -1,0 +1,29 @@
+{
+  "name": "google_task_clone-backend",
+  "version": "1.0.0",
+  "description": "NodeJS, Express",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -e js ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nic-DC/Google_Task_Clone-BACKEND.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nic-DC/Google_Task_Clone-BACKEND/issues"
+  },
+  "homepage": "https://github.com/Nic-DC/Google_Task_Clone-BACKEND#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uniqid": "^5.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
