@@ -22,7 +22,7 @@ server.use(express.static(publicFolderPath));
 server.use(express.json());
 
 /*------------- ENDPOINTS -------------*/
-server.use("/planners/:plannerId/tasks", tasksRouter);
+server.use("/planners", tasksRouter);
 server.use("/planners", plannersRouter);
 
 /*----------- ERROR HANDLERS -------------*/

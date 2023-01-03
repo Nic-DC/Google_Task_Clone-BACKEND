@@ -9,14 +9,18 @@ const { NotFound, BadRequest } = httpErrors;
 
 const tasksRouter = express.Router();
 
-//1. POST: http://localhost:3005/tasks
-tasksRouter.post("/", checkTaskSchema, triggerBadRequest, async (req, res, next) => {
+//1. POST: http://localhost:3005/planners/
+tasksRouter.post("/:plannerId/tasks", checkTaskSchema, triggerBadRequest, async (req, res, next) => {
   console.log("Request Body is: ", req.body);
 
   try {
+    const { plannerId } = req.params;
+    console.log("plannerId is: ", plannerId);
+
     const task = {
       _id: uniqid(),
       ...req.body,
+      plannerId: plannerId,
       createdAt: new Date(),
     };
 
@@ -26,26 +30,43 @@ tasksRouter.post("/", checkTaskSchema, triggerBadRequest, async (req, res, next)
     tasksList.push(task);
 
     await writeTasks(tasksList);
-    res.status(201).send({ message: `Task: ${task.name} with id: ${task._id} has been successfully created` });
+    res.status(201).send({
+      message: `Task: ${task.name} with id: ${task._id} has been successfully created in the Planner width id: ${plannerId}`,
+    });
   } catch (error) {
     next(error);
   }
 });
 
-// 2. GET: http://localhost:3005/tasks/
-tasksRouter.get("/", async (req, res, next) => {
+// 2. GET: http://localhost:3005/planners/
+tasksRouter.get("/:plannerId/tasks", async (req, res, next) => {
   try {
+    const { plannerId } = req.params;
+
     const tasksList = await getTasks();
 
-    if (req.query && req.query.category) {
-      const filteredTasks = tasksList.filter(
-        (task) => task.category.toLowerCase() === req.query.category.toLowerCase()
-      );
-      res.send(filteredTasks);
-    } else if (req.query & req.query.done) {
-      const filteredTasks = tasksList.filter((task) => task.done === req.query.done);
+    const tasks = tasksList.filter((task) => task.plannerId === plannerId);
+
+    if (tasks.length > 0) {
+      if (req.query && req.query.category) {
+        const filteredTasksCat = tasks.filter(
+          (task) => task.category.toLowerCase() === req.query.category.toLowerCase()
+        );
+        res.send(filteredTasksCat);
+      } else if (req.query & req.query.done) {
+        const filteredTasksDone = tasks.filter((task) => task.done === req.query.done);
+        res.send(filteredTasksDone);
+      } else {
+        const uncompletedTasks = tasks.filter((task) => task.done === "false");
+
+        if (uncompletedTasks.length > 0) {
+          res.send(uncompletedTasks);
+        } else {
+          next(NotFound(`There are NO uncompleted tasks in the planner with id: ${plannerId}`));
+        }
+      }
     } else {
-      res.send(tasksList);
+      next(NotFound(`This planner, with id: ${plannerId} has no tasks yet.`));
     }
   } catch (error) {
     next(error);
