@@ -42,6 +42,8 @@ tasksRouter.get("/", async (req, res, next) => {
         (task) => task.category.toLowerCase() === req.query.category.toLowerCase()
       );
       res.send(filteredTasks);
+    } else if (req.query & req.query.done) {
+      const filteredTasks = tasksList.filter((task) => task.done === req.query.done);
     } else {
       res.send(tasksList);
     }
@@ -84,7 +86,7 @@ tasksRouter.put("/:taskId", async (req, res, next) => {
       tasksList[index] = updatedTask;
 
       console.log("The updated task looks like this: ", updatedTask);
-
+      await writeTasks(tasksList);
       res.send(updatedTask);
     } else {
       next(NotFound(`The task with id: ${taskId} is not in your archive`));
@@ -102,6 +104,7 @@ tasksRouter.delete("/:taskId", async (req, res, next) => {
     const remainingTasks = tasksList.filter((task) => task._id !== req.params.taskId);
 
     if (tasksList.length !== remainingTasks.length) {
+      await writeTasks(remainingTasks);
       res.send({ message: `Task with id: ${req.params.taskId} deleted successfully` });
     } else {
       next(NotFound(`Task with id: ${req.params.taskId} is not in your archive`));

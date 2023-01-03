@@ -1,5 +1,6 @@
 import express from "express";
 import tasksRouter from "./api/tasks/index.js";
+import plannersRouter from "./api/planners/index.js";
 
 import listEndpoints from "express-list-endpoints";
 
@@ -21,7 +22,8 @@ server.use(express.static(publicFolderPath));
 server.use(express.json());
 
 /*------------- ENDPOINTS -------------*/
-server.use("/tasks", tasksRouter);
+server.use("/planners/:plannerId/tasks", tasksRouter);
+server.use("/planners", plannersRouter);
 
 /*----------- ERROR HANDLERS -------------*/
 server.use(badRequestHandler);
