@@ -20,12 +20,6 @@ const taskSchema = {
       errorMessage: "Category is a mandatory field and needs to be a string",
     },
   },
-  done: {
-    in: ["body"],
-    isString: {
-      errorMessage: "Done is a mandatory field and needs to be a string",
-    },
-  },
 };
 
 export const checkTaskSchema = checkSchema(taskSchema);

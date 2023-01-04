@@ -21,6 +21,7 @@ tasksRouter.post("/:plannerId/tasks", checkTaskSchema, triggerBadRequest, async 
       _id: uniqid(),
       ...req.body,
       plannerId: plannerId,
+      done: false,
       createdAt: new Date(),
     };
 
@@ -49,15 +50,22 @@ tasksRouter.get("/:plannerId/tasks", async (req, res, next) => {
 
     if (tasks.length > 0) {
       if (req.query && req.query.category) {
+        console.log("Req.query.done: ", req.query);
         const filteredTasksCat = tasks.filter(
           (task) => task.category.toLowerCase() === req.query.category.toLowerCase()
         );
+        if (req.query.done) {
+          console.log("Req.query.done: ", req.query.done);
+          const filteredTasksDone = filteredTasksCat.filter((task) => task.done === req.query.done);
+          res.send(filteredTasksDone);
+        }
         res.send(filteredTasksCat);
-      } else if (req.query & req.query.done) {
+      } else if (req.query && req.query.done) {
+        console.log("Req.query.done: ", req.query.done);
         const filteredTasksDone = tasks.filter((task) => task.done === req.query.done);
         res.send(filteredTasksDone);
       } else {
-        const uncompletedTasks = tasks.filter((task) => task.done === "false");
+        const uncompletedTasks = tasks.filter((task) => task.done === false);
         if (uncompletedTasks.length > 0) {
           res.send(uncompletedTasks);
         } else {
@@ -72,7 +80,36 @@ tasksRouter.get("/:plannerId/tasks", async (req, res, next) => {
   }
 });
 
-// 3. GET: http://localhost:3005/planners/:plannerId/tasks/:taskId
+// 3. GET:  http://localhost:3005/planners/:plannerId/tasks
+//          -> all active tasks
+tasksRouter.get("/:plannerId/tasks", async (req, res, next) => {
+  try {
+    const { plannerId } = req.params;
+
+    const tasksList = await getTasks();
+
+    const tasks = tasksList.filter((task) => task.plannerId === plannerId);
+
+    if (tasks.length > 0) {
+      //if (req.query && req.query.done) {
+      const completedTasks = tasks.filter((task) => task.done === "true");
+      if (completedTasks.length > 0) {
+        res.send(completedTasks);
+      } else {
+        next(NotFound(`There are NO active tasks in the planner with id: ${plannerId}`));
+      }
+      // } else {
+      //   next(NotFound(`There is NO done property in the task`));
+      // }
+    } else {
+      next(NotFound(`This planner, with id: ${plannerId} has no tasks yet.`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 4. GET: http://localhost:3005/planners/:plannerId/tasks/:taskId
 tasksRouter.get("/:plannerId/tasks/:taskId", async (req, res, next) => {
   try {
     const { plannerId } = req.params;
@@ -97,7 +134,7 @@ tasksRouter.get("/:plannerId/tasks/:taskId", async (req, res, next) => {
   }
 });
 
-// 4. PUT: http://localhost:3005/planners/:plannerId/tasks/:taskId
+// 5. PUT: http://localhost:3005/planners/:plannerId/tasks/:taskId
 tasksRouter.put("/:plannerId/tasks/:taskId", async (req, res, next) => {
   try {
     const { plannerId } = req.params;
@@ -129,7 +166,7 @@ tasksRouter.put("/:plannerId/tasks/:taskId", async (req, res, next) => {
   }
 });
 
-// 5. DELETE: http://localhost:3005/planners/:plannerId/tasks/:taskId
+// 6. DELETE: http://localhost:3005/planners/:plannerId/tasks/:taskId
 tasksRouter.delete("/:plannerId/tasks/:taskId", async (req, res, next) => {
   try {
     const { plannerId } = req.params;

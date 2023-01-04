@@ -98,7 +98,7 @@ plannersRouter.delete("/:plannerId", async (req, res, next) => {
 
     if (plannerList.length !== remainingPlanners.length) {
       await writePlanners(remainingPlanners);
-      res.send({ message: `Planner with id: ${plannerId} is not in your archive` });
+      res.send({ message: `Planner with id: ${plannerId} deleted successfully` });
     } else {
       next(NotFound(`Planner with id: ${plannerId} is not in your archive`));
     }
