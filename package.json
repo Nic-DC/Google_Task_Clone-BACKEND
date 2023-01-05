@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Nic-DC/Google_Task_Clone-BACKEND#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-list-endpoints": "^6.0.0",
     "express-validator": "^6.14.2",

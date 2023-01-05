@@ -8,7 +8,7 @@ import { join } from "path";
 
 import { badRequestHandler, notFoundHandler, serverErrorHandler } from "./errorHandler.js";
 
-// import cors from "cors";
+import cors from "cors";
 
 const server = express(); // create the server
 
@@ -18,7 +18,7 @@ const publicFolderPath = join(process.cwd(), "./public");
 console.log("publicFolderPath: ", publicFolderPath);
 
 server.use(express.static(publicFolderPath));
-// server.use(cors()); // Just to let FE communicate with BE successfully
+server.use(cors()); // Just to let FE communicate with BE successfully
 server.use(express.json());
 
 /*------------- ENDPOINTS -------------*/
